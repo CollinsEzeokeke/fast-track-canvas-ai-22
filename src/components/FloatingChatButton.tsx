@@ -9,7 +9,9 @@ export const FloatingChatButton = () => {
 
   console.log("FloatingChatButton rendered, isOpen:", isOpen);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log("Button clicked, current state:", isOpen);
     setIsOpen(true);
   };
@@ -26,20 +28,23 @@ export const FloatingChatButton = () => {
         <div className="fixed bottom-6 right-6 z-50">
           <Button
             onClick={handleButtonClick}
-            className="w-16 h-16 rounded-full shadow-2xl glass-effect-light border-2 border-construction-gold/30 hover:border-construction-gold hover:shadow-construction-gold/25 transition-all duration-300 animate-slow-pulse bg-construction-gold/20 hover:bg-construction-gold/30"
+            className="w-16 h-16 rounded-full shadow-2xl bg-construction-gold/90 hover:bg-construction-gold border-2 border-construction-gold/30 hover:border-construction-gold hover:shadow-construction-gold/25 transition-all duration-300 animate-pulse"
+            type="button"
           >
-            <MessageCircle className="h-8 w-8 text-construction-gold" />
+            <MessageCircle className="h-8 w-8 text-construction-dark" />
           </Button>
           
           {/* Subtle Ring Animation */}
-          <div className="absolute inset-0 rounded-full border-2 border-construction-gold/10 animate-ping"></div>
+          <div className="absolute inset-0 rounded-full border-2 border-construction-gold/20 animate-ping"></div>
         </div>
       )}
 
       {/* AI Chat Popup */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
-          <FloatingAIChat onClose={handleClose} />
+        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)]">
+          <div className="animate-in slide-in-from-bottom-4 duration-300">
+            <FloatingAIChat onClose={handleClose} />
+          </div>
         </div>
       )}
     </>
