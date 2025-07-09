@@ -1,4 +1,3 @@
-
 import { MessageCircle, Send, Bot, User, X, Minimize2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +11,11 @@ interface Message {
   timestamp: Date;
 }
 
-export const FloatingAIChat = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface FloatingAIChatProps {
+  onClose: () => void;
+}
+
+export const FloatingAIChat = ({ onClose }: FloatingAIChatProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [chatSpeed, setChatSpeed] = useState([50]);
@@ -30,7 +32,7 @@ export const FloatingAIChat = () => {
 
   const quickReplies = [
     "I want to build a duplex",
-    "Looking for property consultation",
+    "Looking for property consultation", 
     "Need a construction quote",
     "Timeline for new project"
   ];
@@ -95,184 +97,160 @@ export const FloatingAIChat = () => {
   };
 
   return (
-    <>
-      {/* Floating Chat Button */}
-      {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="w-16 h-16 rounded-full shadow-2xl glass-effect-light border-2 border-construction-gold/30 hover:border-construction-gold hover:shadow-construction-gold/25 transition-all duration-300 animate-slow-pulse"
-          >
-            <MessageCircle className="h-8 w-8 text-construction-gold" />
-          </Button>
-          
-          {/* Subtle Ring Animation */}
-          <div className="absolute inset-0 rounded-full border-2 border-construction-gold/10" style={{
-            animation: 'ping 6s cubic-bezier(0, 0, 0.2, 1) infinite'
-          }}></div>
+    <div className="glass-effect-light border border-construction-gold/30 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+      {/* Chat Header */}
+      <div className="flex items-center justify-between p-4 border-b border-construction-gold/20 bg-gradient-to-r from-construction-gold/10 to-transparent">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-construction-gold/30 rounded-full flex items-center justify-center">
+            <Bot className="h-5 w-5 text-construction-gold animate-pulse" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">AI Construction Assistant</h3>
+            <p className="text-xs text-muted-foreground flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+              Online • Responds instantly
+            </p>
+          </div>
         </div>
-      )}
+        
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSettings(!showSettings)}
+            className="h-8 w-8 hover:bg-construction-gold/10"
+          >
+            <Settings className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="h-8 w-8 hover:bg-construction-gold/10"
+          >
+            <Minimize2 className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-8 w-8 hover:bg-destructive/10"
+          >
+            <X className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
 
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
-          <div className="glass-effect-light border border-construction-gold/30 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
-            {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-construction-gold/20 bg-gradient-to-r from-construction-gold/10 to-transparent">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-construction-gold/30 rounded-full flex items-center justify-center">
-                  <Bot className="h-5 w-5 text-construction-gold animate-pulse" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">AI Construction Assistant</h3>
-                  <p className="text-xs text-muted-foreground flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                    Online • Responds instantly
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="h-8 w-8 hover:bg-construction-gold/10"
-                >
-                  <Settings className="h-4 w-4 text-muted-foreground" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsMinimized(!isMinimized)}
-                  className="h-8 w-8 hover:bg-construction-gold/10"
-                >
-                  <Minimize2 className="h-4 w-4 text-muted-foreground" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 hover:bg-destructive/10"
-                >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                </Button>
+      {/* Settings Popup */}
+      {showSettings && !isMinimized && (
+        <div className="p-4 border-b border-construction-gold/20 bg-gradient-to-r from-construction-gold/5 to-transparent">
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">Response Speed</label>
+              <Slider
+                value={chatSpeed}
+                onValueChange={setChatSpeed}
+                max={100}
+                min={10}
+                step={10}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Slow</span>
+                <span>Fast</span>
               </div>
             </div>
-
-            {/* Settings Popup */}
-            {showSettings && !isMinimized && (
-              <div className="p-4 border-b border-construction-gold/20 bg-gradient-to-r from-construction-gold/5 to-transparent">
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Response Speed</label>
-                    <Slider
-                      value={chatSpeed}
-                      onValueChange={setChatSpeed}
-                      max={100}
-                      min={10}
-                      step={10}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>Slow</span>
-                      <span>Fast</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Chat Content */}
-            {!isMinimized && (
-              <>
-                {/* Messages */}
-                <div className="h-80 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-construction-gold/5">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex space-x-3 ${message.isBot ? "" : "justify-end"}`}
-                    >
-                      {message.isBot && (
-                        <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Bot className="h-4 w-4 text-construction-gold" />
-                        </div>
-                      )}
-                      
-                      <div
-                        className={`max-w-xs px-4 py-3 rounded-2xl shadow-sm ${
-                          message.isBot
-                            ? "glass-effect-light border border-construction-gold/20 text-foreground"
-                            : "bg-construction-gold text-construction-dark ml-auto shadow-construction-gold/20"
-                        }`}
-                      >
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                      </div>
-                      
-                      {!message.isBot && (
-                        <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center flex-shrink-0">
-                          <User className="h-4 w-4 text-construction-gold" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Typing Indicator */}
-                  {isTyping && (
-                    <div className="flex space-x-3">
-                      <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-construction-gold" />
-                      </div>
-                      <div className="glass-effect-light border border-construction-gold/20 px-4 py-3 rounded-2xl">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse"></div>
-                          <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
-                          <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Quick Replies */}
-                <div className="p-3 border-t border-construction-gold/20 bg-gradient-to-r from-transparent to-construction-gold/5">
-                  <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {quickReplies.map((reply, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleQuickReply(reply)}
-                        className="text-xs px-3 py-1.5 glass-effect-light border border-construction-gold/20 hover:border-construction-gold/40 rounded-full transition-all duration-200 hover:shadow-sm"
-                      >
-                        {reply}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Input */}
-                <div className="p-4 border-t border-construction-gold/20 bg-gradient-to-r from-construction-gold/5 to-transparent">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Ask about construction services..."
-                      className="flex-1 glass-effect-light border-construction-gold/30 focus:border-construction-gold bg-transparent"
-                      onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    />
-                    <Button 
-                      onClick={handleSendMessage} 
-                      className="bg-construction-gold hover:bg-construction-gold-dark text-construction-dark px-4 shadow-construction-gold/20"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
       )}
-    </>
+
+      {/* Chat Content */}
+      {!isMinimized && (
+        <>
+          {/* Messages */}
+          <div className="h-80 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-construction-gold/5">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex space-x-3 ${message.isBot ? "" : "justify-end"}`}
+              >
+                {message.isBot && (
+                  <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-4 w-4 text-construction-gold" />
+                  </div>
+                )}
+                
+                <div
+                  className={`max-w-xs px-4 py-3 rounded-2xl shadow-sm ${
+                    message.isBot
+                      ? "glass-effect-light border border-construction-gold/20 text-foreground"
+                      : "bg-construction-gold text-construction-dark ml-auto shadow-construction-gold/20"
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed">{message.content}</p>
+                </div>
+                
+                {!message.isBot && (
+                  <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4 text-construction-gold" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex space-x-3">
+                <div className="w-8 h-8 bg-construction-gold/30 rounded-full flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-construction-gold" />
+                </div>
+                <div className="glass-effect-light border border-construction-gold/20 px-4 py-3 rounded-2xl">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
+                    <div className="w-2 h-2 bg-construction-gold rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Replies */}
+          <div className="p-3 border-t border-construction-gold/20 bg-gradient-to-r from-transparent to-construction-gold/5">
+            <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
+            <div className="flex flex-wrap gap-1">
+              {quickReplies.map((reply, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleQuickReply(reply)}
+                  className="text-xs px-3 py-1.5 glass-effect-light border border-construction-gold/20 hover:border-construction-gold/40 rounded-full transition-all duration-200 hover:shadow-sm"
+                >
+                  {reply}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Input */}
+          <div className="p-4 border-t border-construction-gold/20 bg-gradient-to-r from-construction-gold/5 to-transparent">
+            <div className="flex space-x-2">
+              <Input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Ask about construction services..."
+                className="flex-1 glass-effect-light border-construction-gold/30 focus:border-construction-gold bg-transparent"
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                className="bg-construction-gold hover:bg-construction-gold-dark text-construction-dark px-4 shadow-construction-gold/20"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
